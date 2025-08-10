@@ -18,12 +18,14 @@ type CartState = {
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, action: 'increase' | 'decrease') => void;
   clearCart: () => void;
+  // Derived selector to get total number of items in cart
+  getTotalItems: () => number;
 };
 
 export const useCartStore = create<CartState>()(
   // Use `persist` middleware to save the cart state to localStorage
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
 
       // Action to add an item (or items) to the cart
@@ -68,6 +70,9 @@ export const useCartStore = create<CartState>()(
 
       // Action to clear the entire cart
       clearCart: () => set({ items: [] }),
+
+      // Derived selector for total count
+      getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
     }),
     {
       name: 'cart-storage', // Name for the item in localStorage
