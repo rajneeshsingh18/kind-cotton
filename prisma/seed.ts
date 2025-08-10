@@ -1,4 +1,3 @@
-// prisma/seed.ts
 import { PrismaClient, Size } from "@prisma/client";
 
 // Initialize Prisma Client
@@ -27,7 +26,7 @@ async function main() {
   console.log("✅ Categories created.");
 
   // --- CREATE PRODUCTS ---
-  console.log("Creating products...");
+  console.log("Creating products with .webp images...");
   const classicTee = await db.product.create({
     data: {
       name: "Classic Cotton Tee",
@@ -38,10 +37,11 @@ async function main() {
       // --- CREATE VARIANTS FOR THIS PRODUCT ---
       variants: {
         create: [
-          { color: "Black", size: Size.M, price: 25.00, stock: 100, images: ["/images/products/black_tee.jpg"] },
-          { color: "Black", size: Size.L, price: 25.00, stock: 80, images: ["/images/products/black_tee.jpg"] },
-          { color: "White", size: Size.S, price: 25.00, stock: 90, images: ["/images/products/white_tee.jpg"] },
-          { color: "White", size: Size.M, price: 25.00, stock: 110, images: ["/images/products/white_tee.jpg"] },
+          // Paths updated to .webp
+          { color: "Black", size: Size.M, price: 25.00, stock: 100, images: ["/images/products/black_tee.webp"] },
+          { color: "Black", size: Size.L, price: 25.00, stock: 80, images: ["/images/products/black_tee.webp"] },
+          { color: "White", size: Size.S, price: 25.00, stock: 90, images: ["/images/products/white_tee.webp"] },
+          { color: "White", size: Size.M, price: 25.00, stock: 110, images: ["/images/products/white_tee.webp"] },
         ],
       },
     },
@@ -57,15 +57,16 @@ async function main() {
       // --- CREATE VARIANTS FOR THIS PRODUCT ---
       variants: {
         create: [
-          { color: "Charcoal", size: Size.M, price: 30.00, stock: 50, images: ["/images/products/charcoal_tee.jpg"] },
-          { color: "Charcoal", size: Size.L, price: 30.00, stock: 45, images: ["/images/products/charcoal_tee.jpg"] },
-          { color: "Navy", size: Size.XL, price: 30.00, stock: 60, images: ["/images/products/navy_tee.jpg"] },
+          // Paths updated to .webp
+          { color: "Charcoal", size: Size.M, price: 30.00, stock: 50, images: ["/images/products/charcoal_tee.webp"] },
+          { color: "Charcoal", size: Size.L, price: 30.00, stock: 45, images: ["/images/products/charcoal_tee.webp"] },
+          { color: "Navy", size: Size.XL, price: 30.00, stock: 60, images: ["/images/products/navy_tee.webp"] },
         ],
       },
     },
   });
 
-  console.log("✅ Products and variants created.");
+  console.log("✅ Products and variants created with .webp images.");
   console.log("🌱 Seed process finished successfully!");
 }
 
