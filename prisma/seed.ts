@@ -1,0 +1,80 @@
+// prisma/seed.ts
+import { PrismaClient, Size } from "@prisma/client";
+
+// Initialize Prisma Client
+const db = new PrismaClient();
+
+async function main() {
+  console.log("🌱 Starting seed process...");
+
+  // --- CREATE CATEGORIES ---
+  console.log("Creating categories...");
+  const tShirtsCategory = await db.category.upsert({
+    where: { name: "T-Shirts" },
+    update: {},
+    create: {
+      name: "T-Shirts",
+    },
+  });
+
+  const hoodiesCategory = await db.category.upsert({
+    where: { name: "Hoodies" },
+    update: {},
+    create: {
+      name: "Hoodies",
+    },
+  });
+  console.log("✅ Categories created.");
+
+  // --- CREATE PRODUCTS ---
+  console.log("Creating products...");
+  const classicTee = await db.product.create({
+    data: {
+      name: "Classic Cotton Tee",
+      description: "A timeless, comfortable t-shirt made from 100% premium cotton. Perfect for everyday wear.",
+      category: {
+        connect: { id: tShirtsCategory.id },
+      },
+      // --- CREATE VARIANTS FOR THIS PRODUCT ---
+      variants: {
+        create: [
+          { color: "Black", size: Size.M, price: 25.00, stock: 100, images: ["/images/products/black_tee.jpg"] },
+          { color: "Black", size: Size.L, price: 25.00, stock: 80, images: ["/images/products/black_tee.jpg"] },
+          { color: "White", size: Size.S, price: 25.00, stock: 90, images: ["/images/products/white_tee.jpg"] },
+          { color: "White", size: Size.M, price: 25.00, stock: 110, images: ["/images/products/white_tee.jpg"] },
+        ],
+      },
+    },
+  });
+
+  const vintageWashTee = await db.product.create({
+    data: {
+      name: "Vintage Wash Tee",
+      description: "Get that worn-in feel from day one with our super-soft vintage wash t-shirt.",
+      category: {
+        connect: { id: tShirtsCategory.id },
+      },
+      // --- CREATE VARIANTS FOR THIS PRODUCT ---
+      variants: {
+        create: [
+          { color: "Charcoal", size: Size.M, price: 30.00, stock: 50, images: ["/images/products/charcoal_tee.jpg"] },
+          { color: "Charcoal", size: Size.L, price: 30.00, stock: 45, images: ["/images/products/charcoal_tee.jpg"] },
+          { color: "Navy", size: Size.XL, price: 30.00, stock: 60, images: ["/images/products/navy_tee.jpg"] },
+        ],
+      },
+    },
+  });
+
+  console.log("✅ Products and variants created.");
+  console.log("🌱 Seed process finished successfully!");
+}
+
+main()
+  .catch(async (e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    // Close the Prisma Client connection
+    await db.$disconnect();
+  });
