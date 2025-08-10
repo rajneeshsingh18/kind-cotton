@@ -6,6 +6,10 @@ import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { ShoppingBag, Star, Check } from "lucide-react"; // 2. Import the Check icon
 
+
+import { useQuickView } from "@/hooks/use-quick-view"; // 1. Import the hook
+
+
 import { useCartStore } from "@/store/cart.store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,6 +30,8 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
   // 3. Add state to track the "added" status
   const [isAdded, setIsAdded] = useState(false);
   const primaryVariant = product.variants[0];
+
+  const openQuickView = useQuickView((state) => state.open); // 2. Get the open action
 
   if (!primaryVariant) {
     return null;
@@ -93,6 +99,14 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
 
       {/* Add to Cart Button - Now with feedback */}
       <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] z-10">
+        {/* 3. Wire up the onClick event */}
+          <button 
+            onClick={() => openQuickView(product)} 
+            className="text-xs px-3 py-1 border rounded-full hover:bg-gray-50"
+          >
+            Quick view
+          </button>
+
         <Button
           onClick={handleAddToCart}
           disabled={isAdded} // 4. Disable button when item is added
