@@ -102,7 +102,7 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
         {/* 3. Wire up the onClick event */}
           <button 
             onClick={() => openQuickView(product)} 
-            className="text-xs px-3 py-1 border rounded-full hover:bg-gray-50"
+            className=" bg-amber-50 text-xs flex-center r px-3 py-1 border rounded-full hover:bg-gray-50"
           >
             Quick view
           </button>
@@ -111,10 +111,10 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
           onClick={handleAddToCart}
           disabled={isAdded} // 4. Disable button when item is added
           className={cn(
-            "w-full opacity-0 group-hover:opacity-100 transition-all duration-200",
+            "bg-amber-100 text-grey-100 w-full opacity-0 group-hover:opacity-100 transition-all duration-200",
             // 5. Conditionally change the background color
             {
-              "bg-emerald-500 hover:bg-emerald-600": isAdded,
+              "bg-emerald-500 hover:bg-amber-100": isAdded,
             }
           )}
         >
