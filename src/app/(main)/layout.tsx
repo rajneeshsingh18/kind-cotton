@@ -10,11 +10,11 @@ export default function MainLayout({
 }>) {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+{/*       <Header /> */}
       <main className="flex-grow">
         {children}
       </main>
-      <Footer />
+{/*       <Footer /> */}
 
       {/* Render the modal here so it's globally available */}
       <QuickViewModal />

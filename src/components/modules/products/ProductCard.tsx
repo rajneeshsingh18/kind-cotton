@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react"; // 1. Import useState
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { ShoppingBag, Star, Check } from "lucide-react"; // 2. Import the Check icon
+import { ShoppingBag, Star, Check, Eye } from "lucide-react"; // Import Eye icon
 
-
-import { useQuickView } from "@/hooks/use-quick-view"; // 1. Import the hook
-
-
+import { useQuickView } from "@/hooks/use-quick-view";
 import { useCartStore } from "@/store/cart.store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -27,11 +24,9 @@ const formatPrice = (price: number) => {
 
 export function ProductCard({ product }: { product: ProductWithVariants }) {
   const addToCart = useCartStore((state) => state.addToCart);
-  // 3. Add state to track the "added" status
+  const openQuickView = useQuickView((state) => state.open);
   const [isAdded, setIsAdded] = useState(false);
   const primaryVariant = product.variants[0];
-
-  const openQuickView = useQuickView((state) => state.open); // 2. Get the open action
 
   if (!primaryVariant) {
     return null;
@@ -41,7 +36,6 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    
     const itemToAdd = {
       id: primaryVariant.id,
       title: product.name,
@@ -50,7 +44,6 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
     };
     addToCart(itemToAdd, 1);
 
-    // Set the state to true and reset after 2 seconds
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
@@ -60,7 +53,7 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
   return (
     <div className="group relative">
       <div className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 border border-transparent hover:border-slate-200">
-        {/* Card content (Image, Details, etc.) remains the same */}
+        {/* Image Container - The hover target for the main CTA */}
         <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
           <Link href={`/products/${product.id}`} className="block w-full h-full">
             <Image
@@ -75,63 +68,47 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
               {tag}
             </div>
           )}
+          {/* ✅ MOVED "Add to Cart" here so it appears over the image on hover */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] z-10">
+            <Button
+              onClick={handleAddToCart}
+              disabled={isAdded}
+              className={cn(
+                "w-full opacity-0 group-hover:opacity-100 transition-all duration-300",
+                { "bg-emerald-500 hover:bg-emerald-600": isAdded }
+              )}
+            >
+              {isAdded ? (
+                <><Check className="w-4 h-4 mr-2" /> Added!</>
+              ) : (
+                <><ShoppingBag className="w-4 h-4 mr-2" /> Add to cart</>
+              )}
+            </Button>
+          </div>
         </div>
+        
+        {/* Product Details */}
         <div className="mt-4">
           <h3 className="text-sm font-medium text-slate-800">
             <Link href={`/products/${product.id}`}>
-              <span aria-hidden="true" className="absolute inset-0 z-0" />
               {product.name}
             </Link>
           </h3>
-          <div className="mt-1 flex items-center justify-between">
+          <div className="mt-2 flex items-center justify-between">
             <p className="text-lg font-semibold text-slate-900">
               {formatPrice(primaryVariant.price)}
             </p>
-            {product.rating && (
-              <div className="flex items-center gap-1 text-sm text-slate-500">
-                <span>{product.rating.toFixed(1)}</span>
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              </div>
-            )}
+            {/* ✅ MOVED "Quick view" here to be always visible */}
+            <Button
+              variant="ghost"
+              className="h-8 w-26 rounded-10px"
+              onClick={() => openQuickView(product)}
+            >
+              <Eye className="h-5 w-5 text-gray-500" />
+              Quick View
+            </Button>
           </div>
         </div>
-      </div>
-
-      {/* Add to Cart Button - Now with feedback */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] z-10">
-        {/* 3. Wire up the onClick event */}
-          <button 
-            onClick={() => openQuickView(product)} 
-            className=" bg-amber-50 text-xs flex-center r px-3 py-1 border rounded-full hover:bg-gray-50"
-          >
-            Quick view
-          </button>
-
-        <Button
-          onClick={handleAddToCart}
-          disabled={isAdded} // 4. Disable button when item is added
-          className={cn(
-            "bg-amber-100 text-grey-100 w-full opacity-0 group-hover:opacity-100 transition-all duration-200",
-            // 5. Conditionally change the background color
-            {
-              "bg-emerald-500 hover:bg-amber-100": isAdded,
-            }
-          )}
-        >
-          {isAdded ? (
-            // 6. Show "Added!" text and checkmark icon
-            <>
-              <Check className="w-4 h-4 mr-2" />
-              Added!
-            </>
-          ) : (
-            // Or show the default text and icon
-            <>
-              <ShoppingBag className="w-4 h-4 mr-2" />
-              Add to cart
-            </>
-          )}
-        </Button>
       </div>
     </div>
   );
