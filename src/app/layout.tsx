@@ -31,6 +31,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} font-sans antialiased`}>
         <div className="flex flex-col min-h-screen">
       <Header />
+      
       <main className="flex-grow">
         {children}
         <QuickViewModal/>
