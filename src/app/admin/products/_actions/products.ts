@@ -68,3 +68,94 @@ export async function addProduct(prevState: unknown, formData: FormData) {
   revalidatePath("/admin/products");
   redirect("/admin/products");
 }
+
+
+
+// New Server Action for updating a product
+export async function updateProduct(productId: string, prevState: unknown, formData: FormData) {
+  const productData = Object.fromEntries(formData.entries());
+
+  const productResult = addProductSchema.safeParse(productData);
+  if (!productResult.success) {
+    return productResult.error.flatten().fieldErrors;
+  }
+
+  const variantsJson = formData.get("variants") as string;
+  if (!variantsJson) {
+    return { generalError: "At least one variant is required." };
+  }
+
+  try {
+    const variants = JSON.parse(variantsJson);
+    const variantsResult = z.array(variantSchema.extend({ dbId: z.string().optional() })).safeParse(variants);
+
+    if (!variantsResult.success) {
+      return { generalError: "One or more variants have invalid data." };
+    }
+
+    const { name, description, categoryId } = productResult.data;
+    const submittedVariants = variantsResult.data;
+
+    // Use a transaction to ensure all database operations succeed or fail together
+    await db.$transaction(async (tx) => {
+      // 1. Update the main product details
+      await tx.product.update({
+        where: { id: productId },
+        data: { name, description, categoryId },
+      });
+
+      const existingVariantIds = (await tx.productVariant.findMany({
+        where: { productId },
+        select: { id: true },
+      })).map(v => v.id);
+
+      const submittedVariantDbIds = submittedVariants.map(v => v.dbId).filter(Boolean) as string[];
+
+      // 2. Identify variants to delete
+      const variantsToDelete = existingVariantIds.filter(id => !submittedVariantDbIds.includes(id));
+      if (variantsToDelete.length > 0) {
+        await tx.productVariant.deleteMany({
+          where: { id: { in: variantsToDelete } },
+        });
+      }
+
+      // 3. Update existing variants
+      const variantsToUpdate = submittedVariants.filter(v => v.dbId);
+      for (const variant of variantsToUpdate) {
+        await tx.productVariant.update({
+          where: { id: variant.dbId },
+          data: {
+            color: variant.color,
+            size: variant.size,
+            price: variant.price,
+            stock: variant.stock,
+            images: [variant.images],
+          },
+        });
+      }
+
+      // 4. Create new variants
+      const variantsToCreate = submittedVariants.filter(v => !v.dbId);
+      if (variantsToCreate.length > 0) {
+        await tx.productVariant.createMany({
+          data: variantsToCreate.map(variant => ({
+            productId,
+            color: variant.color,
+            size: variant.size,
+            price: variant.price,
+            stock: variant.stock,
+            images: [variant.images],
+            lemonSqueezyVariantId: "placeholder",
+          })),
+        });
+      }
+    });
+
+  } catch (e: any) {
+    console.error("Database Error:", e.message);
+    return { generalError: "Failed to update product." };
+  }
+
+  revalidatePath("/admin/products");
+  redirect("/admin/products");
+}
