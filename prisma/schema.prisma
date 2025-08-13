@@ -146,6 +146,8 @@ model ProductVariant {
   price     Float    // Price for this specific variant
   stock     Int      // Inventory count for this variant
   images    String[] // List of image URLs for this variant
+  lemonSqueezyVariantId String // ✅ Add this line
+
 
   /// Relations
   productId String

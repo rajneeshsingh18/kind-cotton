@@ -38,10 +38,10 @@ async function main() {
       variants: {
         create: [
           // Paths updated to .webp
-          { color: "Black", size: Size.M, price: 25.00, stock: 100, images: ["/images/products/black_tee.webp"] },
-          { color: "Black", size: Size.L, price: 25.00, stock: 80, images: ["/images/products/black_tee.webp"] },
-          { color: "White", size: Size.S, price: 25.00, stock: 90, images: ["/images/products/white_tee.webp"] },
-          { color: "White", size: Size.M, price: 25.00, stock: 110, images: ["/images/products/white_tee.webp"] },
+          { color: "Black", size: Size.M, price: 499.00, stock: 100, images: ["/images/products/black_tee.webp"] ,  lemonSqueezyVariantId: "948247" },
+          { color: "Black", size: Size.L, price: 499.00, stock: 80, images: ["/images/products/black_tee.webp"] , lemonSqueezyVariantId: "948259"},
+          { color: "White", size: Size.S, price: 499.00, stock: 90, images: ["/images/products/white_tee.webp"] ,lemonSqueezyVariantId: "948274"},
+          { color: "White", size: Size.M, price: 499.00, stock: 110, images: ["/images/products/white_tee.webp"] ,lemonSqueezyVariantId: "948275"},
         ],
       },
     },
@@ -58,9 +58,9 @@ async function main() {
       variants: {
         create: [
           // Paths updated to .webp
-          { color: "Charcoal", size: Size.M, price: 30.00, stock: 50, images: ["/images/products/charcoal_tee.webp"] },
-          { color: "Charcoal", size: Size.L, price: 30.00, stock: 45, images: ["/images/products/charcoal_tee.webp"] },
-          { color: "Navy", size: Size.XL, price: 30.00, stock: 60, images: ["/images/products/navy_tee.webp"] },
+          { color: "Charcoal", size: Size.M, price: 1500.00, stock: 50, images: ["/images/products/charcoal_tee.webp"]  ,lemonSqueezyVariantId: "948277" },
+          { color: "Charcoal", size: Size.L, price: 1500.00, stock: 45, images: ["/images/products/charcoal_tee.webp"] ,lemonSqueezyVariantId: "948278" },
+          { color: "Navy", size: Size.XL, price: 1500.00, stock: 60, images: ["/images/products/navy_tee.webp"] ,lemonSqueezyVariantId: "948279" },
         ],
       },
     },

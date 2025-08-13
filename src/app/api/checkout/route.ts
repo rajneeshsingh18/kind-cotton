@@ -1,68 +1,99 @@
-// src/app/api/checkout/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
+import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { auth } from "@/lib/auth";
 
-// Ensure environment variables are set
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || "http://localhost:3000";
+// --- Environment Variable Validation ---
+const lemonsqueezyApiKey = process.env.LEMONSQUEEZY_API_KEY;
+const lemonsqueezyStoreId = process.env.LEMONSQUEEZY_STORE_ID;
 
-if (!stripeSecretKey) {
-  throw new Error("STRIPE_SECRET_KEY is not set");
+if (!lemonsqueezyApiKey || !lemonsqueezyStoreId) {
+  throw new Error("Missing Lemon Squeezy API key or Store ID in .env");
 }
 
+const LEMONSQUEEZY_API_URL = "https://api.lemonsqueezy.com/v1/checkouts";
 
-
-type IncomingCartItem = {
-  id: string; // variant id
-  title: string;
-  price: number; // client-side price, will be verified server-side
-  img: string;
+type CartItem = {
+  id: string;
   quantity: number;
 };
 
-
-
-
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function POST(request: Request) {
   try {
-    const { items } = await request.json();
+    const userSession = await auth();
+    const { items }: { items: CartItem[] } = await request.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
     }
 
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "inr",
-        product_data: {
-          name: item.title,
-          images: [item.img],
-        },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.quantity,
-    }));
-    
-    // ✅ THE FIX: Use the reliable environment variable for the base URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-    // Create a Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/cart`,
+    const variantIds = items.map((item) => item.id);
+    const productVariants = await db.productVariant.findMany({
+      where: { id: { in: variantIds } },
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    // Create the variant_quantities array
+    const variantQuantities = items.map((item) => {
+      const variant = productVariants.find(p => p.id === item.id);
+      if (!variant) {
+        throw new Error(`Product variant with ID ${item.id} not found.`);
+      }
+      const variantId = parseInt(variant.lemonSqueezyVariantId);
+      if (isNaN(variantId)) {
+        throw new Error(`Invalid Lemon Squeezy Variant ID for product: ${variant.id}`);
+      }
+      return {
+        variant_id: variantId,
+        quantity: item.quantity,
+      };
+    });
+
+    // --- ✅ THE FIX: Corrected API Request Body Structure ---
+    const payload = {
+      data: {
+        type: 'checkouts',
+        attributes: {
+          checkout_data: {
+            // email: userSession?.user?.email || undefined,
+            // name: userSession?.user?.name || undefined,
+            // The variant list goes here for multi-product checkouts
+            variant_quantities: variantQuantities,
+          }
+        },
+        relationships: {
+          // The relationships object should ONLY contain the store
+          store: {
+            data: {
+              type: 'stores',
+              id: lemonsqueezyStoreId
+            }
+          }
+        }
+      }
+    };
+
+    const response = await fetch(LEMONSQUEEZY_API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+        'Authorization': `Bearer ${lemonsqueezyApiKey}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Lemon Squeezy API Error:", error.errors || error);
+      throw new Error("Lemon Squeezy API error");
+    }
+
+    const checkout = await response.json();
+    const checkoutUrl = checkout.data.attributes.url;
+
+    return NextResponse.json({ checkoutUrl });
 
   } catch (err: any) {
-    console.error("Stripe Error:", err.message);
+    console.error("Checkout Route Error:", err.message);
     return NextResponse.json({ error: "Error creating checkout session." }, { status: 500 });
   }
 }

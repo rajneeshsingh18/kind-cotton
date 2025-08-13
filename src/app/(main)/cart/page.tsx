@@ -7,12 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-
-// Initialize Stripe.js with your publishable key
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
 
 // Utility to format currency
 const formatPrice = (price: number) =>
@@ -29,7 +23,7 @@ export default function CartPage() {
   const shippingCost = subtotal > 500 ? 0 : 50;
   const total = subtotal + shippingCost;
 
-  // Function to handle the checkout process
+  // ✅ This is the updated checkout logic for Lemon Squeezy
   const handleCheckout = async () => {
     setIsLoading(true);
     try {
@@ -39,18 +33,17 @@ export default function CartPage() {
         body: JSON.stringify({ items }),
       });
 
-      const { sessionId } = await response.json();
-      if (!sessionId) throw new Error("Failed to create checkout session.");
-
-      const stripe = await stripePromise;
-      if (stripe) {
-        // Redirect to Stripe's secure checkout page
-        await stripe.redirectToCheckout({ sessionId });
+      const { checkoutUrl } = await response.json();
+      if (!checkoutUrl) {
+        throw new Error("Could not create checkout session.");
       }
+
+      // Redirect directly to the Lemon Squeezy checkout page
+      window.location.href = checkoutUrl;
+
     } catch (error) {
       console.error("Checkout Error:", error);
-      alert("An error occurred during checkout. Please try again.");
-    } finally {
+      alert("An error occurred. Please try again.");
       setIsLoading(false);
     }
   };
@@ -105,7 +98,7 @@ export default function CartPage() {
                       <div className="text-lg font-semibold">{formatPrice(item.price * item.quantity)}</div>
                     </div>
                   </div>
-                  <div className="self-start sm:self-center">
+                   <div className="self-start sm:self-center">
                     <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="hover:bg-red-50">
                       <Trash2 className="h-5 w-5 text-red-500" />
                     </Button>
