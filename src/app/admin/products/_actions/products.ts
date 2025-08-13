@@ -18,7 +18,8 @@ const variantSchema = z.object({
   size: z.nativeEnum(Size),
   price: z.coerce.number().min(1, "Price must be at least 1"),
   stock: z.coerce.number().min(0, "Stock cannot be negative"),
-  images: z.string().url("Image must be a valid URL").min(1, "Image is required"),
+   images: z.string(), // ✅ Changed: Now allows any string, including empty
+  // images: z.string().url("Image must be a valid URL").min(1, "Image is required"),
 });
 
 // This is the Server Action function
