@@ -160,3 +160,27 @@ export async function updateProduct(productId: string, prevState: unknown, formD
   revalidatePath("/admin/products");
   redirect("/admin/products");
 }
+
+
+
+// New Server Action for deleting a product
+export async function deleteProduct(productId: string) {
+  try {
+    const product = await db.product.delete({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      return { error: "Product not found." };
+    }
+    
+    // Refresh the products page to show the updated list
+    revalidatePath("/admin/products");
+    
+    return { success: "Product deleted successfully." };
+
+  } catch (error) {
+    console.error("Failed to delete product:", error);
+    return { error: "Failed to delete product." };
+  }
+}
