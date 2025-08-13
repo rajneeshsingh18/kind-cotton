@@ -120,3 +120,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 300% 300%;
+  animation: gradientMove 15s ease infinite;
+}
+
+
+/* Tailwind CSS animations — add this to globals.css */
+@keyframes breathing-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-breathing-gradient {
+  background-size: 200% 200%;
+  animation: breathing-gradient 12s ease-in-out infinite;
+}

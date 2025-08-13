@@ -7,7 +7,7 @@ export default function AdminLayout({
 }) {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      {/* Sidebar */}
+      {/* Desktop Sidebar (Fixed on the left) */}
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
@@ -18,12 +18,18 @@ export default function AdminLayout({
           </div>
         </div>
       </div>
-      {/* Main Content */}
+      
+      {/* Main Content Area */}
       <div className="flex flex-col">
-        {/* We can add a header here later if needed */}
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        {/* The main content now dynamically adjusts its bottom padding on mobile */}
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 pb-20 md:pb-6">
           {children}
         </main>
+      </div>
+
+      {/* Mobile Bottom Navigation Bar (Fixed) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur p-2">
+        <SidebarNav />
       </div>
     </div>
   );
