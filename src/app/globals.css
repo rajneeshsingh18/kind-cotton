@@ -151,3 +151,63 @@
   background-size: 200% 200%;
   animation: breathing-gradient 12s ease-in-out infinite;
 }
+
+@layer utilities {
+  @keyframes canopy-x {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(calc(-100% - var(--gap)), 0, 0);
+    }
+  }
+
+  @keyframes canopy-y {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, calc(-100% - var(--gap)), 0);
+    }
+  }
+
+  .animate-canopy-horizontal {
+    animation: canopy-x var(--duration, 20s) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-canopy-vertical {
+    animation: canopy-y var(--duration, 20s) linear infinite;
+    will-change: transform;
+  }
+
+  /* Reverse animation direction */
+  .animate-canopy-reverse {
+    animation-direction: reverse;
+  }
+
+  /* Pause utility (works with hover:) */
+  .animate-pause {
+    animation-play-state: paused !important;
+  }
+
+  /* Optional fade mask */
+  .canopy-mask-x {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+  }
+
+  .canopy-mask-y {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+  }
+}
+

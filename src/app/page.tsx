@@ -6,6 +6,7 @@ import HeroSection from "@/components/modules/homepage/HeroSection";
 import CategoryNav from "@/components/modules/homepage/CategoryNav";
 import NewsletterSignup from "@/components/modules/homepage/NewsletterSignup";
 import StyleGuideSection from "@/components/modules/homepage/StyleGuideSection";
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials"; // Added import
 
 
 import { DealsSection } from "@/components/modules/homepage/DealsSection";
@@ -31,6 +32,26 @@ export default async function HomePage() {
   const featuredProducts = featuredProductsFromDb.filter(
     (product) => product.variants.length > 0
   );
+
+
+  // Data for the new testimonials section
+  const testimonials = [
+    {
+      description: "KindCotton has completely transformed my wardrobe. The quality is amazing, and the clothes are so comfortable and stylish.",
+      image: "https://images.unsplash.com/photo-1611558709798-e009c8fd7706?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
+      name: "Isabelle Carlos",
+      handle: "@isabellecarlos",
+    },
+
+    {
+      description: "KindCotton has completely transformed my wardrobe. The quality is amazing, and the clothes are so comfortable and stylish.",
+      image: "https://images.unsplash.com/photo-1611558709798-e009c8fd7706?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
+      name: "Rohan",
+      handle: "@isabellecarlos",
+    }
+    // ... (other testimonial objects) ...
+  ];
+  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,6 +85,12 @@ export default async function HomePage() {
       <NewsletterSignup/>
 
       <StyleGuideSection/>
+
+      {/* Animated Testimonials Section */}
+      <section className="py-12">
+        <h2 className="text-center text-2xl font-bold tracking-tight mb-8">What Our Customers Are Saying</h2>
+        <AnimatedTestimonials data={testimonials} />
+      </section>
 
         {/* Deals (client) */}
        
