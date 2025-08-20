@@ -1,0 +1,7 @@
+{
+  "build": {
+    "env": {
+      "NEXT_DISABLE_MANIFEST_MISMATCH_ERROR": "true"
+    }
+  }
+}
