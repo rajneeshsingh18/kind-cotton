@@ -20,7 +20,7 @@ export function DealsSection() {
     <section className="mb-12 bg-gray-100 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
       <div>
         <h3 className="text-2xl font-bold">Limited-Time Deals</h3>
-        <p className="text-gray-600">Don't miss out on these special prices.</p>
+        <p className="text-gray-600">Don&apos;t miss out on these special prices.</p>
       </div>
       <div className="flex items-center gap-4">
         <div className="flex gap-2 text-center">

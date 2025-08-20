@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from "next/image"; // Import the component
+
 
 export default function HeroSection() {
   return (
@@ -15,9 +17,9 @@ export default function HeroSection() {
         poster="/images/hero-poster.jpg"
       />
       {/* Mobile: poster image */}
-      <img
+      <Image
         src="/images/hero-poster.jpg"
-        alt="KindCotton Collection"
+        alt="hero"
         className="block md:hidden w-full h-64 object-cover"
       />
 

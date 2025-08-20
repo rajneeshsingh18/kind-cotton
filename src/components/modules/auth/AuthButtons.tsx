@@ -1,21 +1,16 @@
-// src/components/modules/auth/AuthButtons.tsx
-"use client" // This component needs to be a client component to use event handlers
+"use client";
+import { signIn, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import type { Session } from "next-auth";
 
-import { signIn, signOut } from "next-auth/react"
-import { Button } from "../../ui/button" // Adjust the path as needed based on your folder structure
-
-// A component to show login/logout buttons based on session
-export function AuthButtons({ session }: { session: any }) {
-  if (session) {
+export function AuthButtons({ session }: { session: Session | null }) {
+  if (session?.user) { // Check for session.user for type safety
     return (
-      <div className="flex items-center gap-4">
-        <p>
-          {session.user?.name}
-        </p>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium hidden sm:inline">{session.user.name}</span>
         <Button onClick={() => signOut()}>Sign Out</Button>
       </div>
-    )
+    );
   }
-
-  return <Button onClick={() => signIn("google")}>Sign in with Google</Button>
+  return <Button onClick={() => signIn("google")}>Sign In</Button>;
 }

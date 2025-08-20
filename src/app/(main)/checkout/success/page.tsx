@@ -8,7 +8,7 @@ export default function CheckoutSuccessPage() {
       <CheckCircle className="h-20 w-20 text-green-500 mb-6" />
       <h1 className="text-4xl font-bold text-slate-900 mb-4">Payment Successful!</h1>
       <p className="max-w-md text-lg text-gray-600 mb-8">
-        Thank you for your order. We've received your payment and a confirmation email will be sent to you shortly.
+        Thank you for your order. We&apos;ve received your payment and a confirmation email will be sent to you shortly.
       </p>
       <div className="flex flex-col sm:flex-row gap-4">
         <Button asChild variant="outline" size="lg" className="rounded-full">

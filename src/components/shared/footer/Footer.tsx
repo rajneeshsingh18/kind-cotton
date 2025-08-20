@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link"; // 1. Make sure Link is imported
+
 import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 
 export function Footer() {
@@ -13,24 +15,24 @@ export function Footer() {
 
           {/* Navigation Links */}
           <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
-            <a href="/" className="hover:text-gray-900">Home</a>
-            <a href="/shop" className="hover:text-gray-900">Shop</a>
-            <a href="/about" className="hover:text-gray-900">About Us</a>
-            <a href="/contact" className="hover:text-gray-900">Contact</a>
-            <a href="/faq" className="hover:text-gray-900">FAQ</a>
+            <Link href="/" className="hover:text-gray-900">Home</Link>
+            <Link href="/shop" className="hover:text-gray-900">Shop</Link>
+            <Link href="/about" className="hover:text-gray-900">About Us</Link>
+            <Link href="/contact" className="hover:text-gray-900">Contact</Link>
+            <Link href="/faq" className="hover:text-gray-900">FAQ</Link>
           </div>
 
           {/* Social Icons */}
           <div className="flex gap-4 text-gray-500">
-            <a href="#" aria-label="Facebook" className="hover:text-blue-600">
+            <Link href="#" aria-label="Facebook" className="hover:text-blue-600">
               <FaFacebookF size={18} />
-            </a>
-            <a href="#" aria-label="Twitter" className="hover:text-sky-500">
+            </Link>
+            <Link href="#" aria-label="Twitter" className="hover:text-sky-500">
               <FaTwitter size={18} />
-            </a>
-            <a href="#" aria-label="Instagram" className="hover:text-pink-500">
+            </Link>
+            <Link href="#" aria-label="Instagram" className="hover:text-pink-500">
               <FaInstagram size={18} />
-            </a>
+            </Link>
           </div>
         </div>
 

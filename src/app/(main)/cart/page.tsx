@@ -55,7 +55,7 @@ export default function CartPage() {
         <div className="text-center py-20">
           <ShoppingBag className="mx-auto mb-6 h-16 w-16 text-gray-400" />
           <h1 className="text-3xl font-bold mb-2">Your Cart is Empty</h1>
-          <p className="text-gray-500 mb-8">Looks like you haven't added anything yet.</p>
+          <p className="text-gray-500 mb-8">Looks like you haven&apos;t added anything yet.</p>
           <Button asChild size="lg" className="rounded-full">
             <Link href="/products">🛒 Start Shopping</Link>
           </Button>
