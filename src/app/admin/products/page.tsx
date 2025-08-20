@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Edit, Trash2, MoreVertical } from "lucide-react";
+import { PlusCircle} from "lucide-react";
 import { ProductActions } from "./_components/ProductActions";
 
 const formatPrice = (price: number) =>

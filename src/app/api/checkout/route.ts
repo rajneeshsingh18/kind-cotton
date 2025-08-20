@@ -108,11 +108,13 @@ export async function POST(request: Request) {
       checkoutUrl: checkout.data.attributes.url 
     });
 
-  } catch (err: any) {
-    console.error("Checkout Route Error:", err);
-    return NextResponse.json(
-      { error: "An internal server error occurred." },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "An unknown error occurred";
+    console.error("Checkout Route Error:", message);
+
+    return NextResponse.json(
+      { error: "An internal server error occurred." },
+      { status: 500 }
+    );
   }
 }

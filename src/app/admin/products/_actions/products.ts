@@ -60,8 +60,9 @@ export async function addProduct(prevState: unknown, formData: FormData) {
       },
     });
 
-  } catch (e: any) {
-    console.error("Database Error:", e.message);
+  } catch (err: unknown) { // ✅ FIX: Changed from 'any' to 'unknown'
+    const message = err instanceof Error ? err.message : "An unknown database error occurred";
+    console.error("Database Error:", message);
     return { generalError: "Failed to create product. Please check your input." };
   }
 
@@ -152,8 +153,9 @@ export async function updateProduct(productId: string, prevState: unknown, formD
       }
     });
 
-  } catch (e: any) {
-    console.error("Database Error:", e.message);
+  } catch (err: unknown) { // ✅ FIX: Changed from 'any' to 'unknown'
+    const message = err instanceof Error ? err.message : "An unknown database error occurred";
+    console.error("Database Error:", message);
     return { generalError: "Failed to update product." };
   }
 
@@ -179,8 +181,9 @@ export async function deleteProduct(productId: string) {
     
     return { success: "Product deleted successfully." };
 
-  } catch (error) {
-    console.error("Failed to delete product:", error);
+  } catch (err: unknown) { // ✅ FIX: Changed variable name and added safe handling
+    const message = err instanceof Error ? err.message : "An unknown error occurred";
+    console.error("Delete Error:", message);
     return { error: "Failed to delete product." };
   }
 }

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 
 export function DealsSection() {
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 58 * 60); // 12 hours, 58 mins

@@ -2,29 +2,9 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import Google from "next-auth/providers/google"
+import { Role } from "@prisma/client"
 
 import db from "@/lib/db"
-
-import type { User as NextAuthUser } from "next-auth";
-import type { AdapterUser } from "next-auth/adapters";
-
-declare module "next-auth" {
-  interface User {
-    role?: string;
-  }
-  interface Session {
-    user: {
-      id?: string;
-      role?: string;
-    }
-  }
-}
-
-declare module "next-auth/adapters" {
-  interface AdapterUser {
-    role?: string;
-  }
-}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
@@ -42,7 +22,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ token, session }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as Role;
+        // Ensure name, email, and image are preserved from the token
+        if (token.name) session.user.name = token.name as string;
+        if (token.email) session.user.email = token.email as string;
+        if (token.picture) session.user.image = token.picture as string;
       }
       return session
     },

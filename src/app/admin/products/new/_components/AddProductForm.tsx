@@ -52,7 +52,7 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
     setVariants(variants.filter((v) => v.id !== id));
   };
 
-  const handleVariantChange = (id: number, field: keyof Variant, value: any) => {
+  const handleVariantChange = (id: number, field: keyof Variant, value: string | number) => {
     setVariants(
       variants.map((v) => (v.id === id ? { ...v, [field]: value } : v))
     );

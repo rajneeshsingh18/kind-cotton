@@ -1,10 +1,11 @@
 import db from "@/lib/db";
 import { EditProductForm } from "./_components/EditProductForm";
 
-export default async function EditProductPage({ params }: { params: { productId: string }}) {
+export default async function EditProductPage({ params }: { params: Promise<{ productId: string }>}) {
+  const { productId } = await params;
   const [product, categories] = await Promise.all([
     db.product.findUnique({
-      where: { id: params.productId },
+      where: { id: productId },
       include: { variants: true },
     }),
     db.category.findMany(),

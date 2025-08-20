@@ -1,5 +1,5 @@
-import { Header } from "@/components/shared/header/index";
-import { Footer } from "@/components/shared/footer/Footer";
+// import { Header } from "@/components/shared/header/index";
+// import { Footer } from "@/components/shared/footer/Footer";
 import { QuickViewModal } from "@/components/modules/products/QuickViewModal";
 
 

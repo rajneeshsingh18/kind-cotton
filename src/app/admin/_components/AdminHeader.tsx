@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Menu, Package } from "lucide-react";
-import Link from "next/link";
+import { Menu } from "lucide-react";
 
 interface AdminHeaderProps {
   onMenuClick: () => void;

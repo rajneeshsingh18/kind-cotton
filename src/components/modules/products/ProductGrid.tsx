@@ -1,4 +1,6 @@
 import { Star } from "lucide-react";
+import Image from "next/image";
+
 
 type Product = {
   id: string;
@@ -19,7 +21,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
         <div key={product.id} className="group relative">
           <div className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 border border-transparent hover:border-slate-200">
             <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
-              <img
+              <Image
                 src={product.img}
                 alt={product.title}
                 className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"

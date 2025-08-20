@@ -4,15 +4,14 @@ import db from "@/lib/db";
 import { ProductDetailsClient } from "./ProductDetailsClient";
 
 interface ProductDetailPageProps {
-  params: {
-    productId: string;
-  };
+  params: Promise<{ productId: string }>;
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  const { productId } = await params;
   const product = await db.product.findUnique({
     where: {
-      id: params.productId,
+      id: productId,
     },
     // Fetch all variants to allow user selection
     include: {
