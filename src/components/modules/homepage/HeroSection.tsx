@@ -19,7 +19,8 @@ export default function HeroSection() {
       {/* Mobile: poster image */}
       <Image
         src="/images/hero-poster.jpg"
-        alt="hero"
+        alt="KindCotton Collection"
+        fill // ✅ ADD THIS PROP
         className="block md:hidden w-full h-64 object-cover"
       />
 
