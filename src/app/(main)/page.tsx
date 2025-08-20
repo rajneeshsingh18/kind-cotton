@@ -59,3 +59,16 @@
 //     </div>
 //   );
 // }
+
+
+export default function HomePage() {
+  return (
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold">Homepage Build Test</h1>
+      <p>
+        If this page deploys successfully, the build issue is related to a component
+        or data fetching on the original homepage.
+      </p>
+    </div>
+  );
+}
