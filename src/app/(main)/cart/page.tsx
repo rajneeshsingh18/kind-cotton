@@ -23,29 +23,9 @@ export default function CartPage() {
   const shippingCost = subtotal > 500 ? 0 : 50;
   const total = subtotal + shippingCost;
 
-  // ✅ This is the updated checkout logic for Lemon Squeezy
-  const handleCheckout = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items }),
-      });
-
-      const { checkoutUrl } = await response.json();
-      if (!checkoutUrl) {
-        throw new Error("Could not create checkout session.");
-      }
-
-      // Redirect directly to the Lemon Squeezy checkout page
-      window.location.href = checkoutUrl;
-
-    } catch (error) {
-      console.error("Checkout Error:", error);
-      alert("An error occurred. Please try again.");
-      setIsLoading(false);
-    }
+  const handleCheckout = () => {
+    // Redirect to internal checkout page
+    window.location.href = '/checkout';
   };
 
   return (

@@ -4,8 +4,8 @@
 /// Defines the database connection. We're using PostgreSQL.
 /// The URL is loaded from the .env file for security.
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 /// Configures the Prisma Client generator.
@@ -26,11 +26,11 @@ enum Role {
 
 /// Defines the possible statuses for an order.
 enum OrderStatus {
-  PENDING     // Order placed, awaiting payment confirmation.
-  PROCESSING  // Payment confirmed, order is being prepared.
-  SHIPPED     // Order has been shipped.
-  DELIVERED   // Order has been delivered.
-  CANCELLED   // Order was cancelled.
+  PENDING // Order placed, awaiting payment confirmation.
+  PROCESSING // Payment confirmed, order is being prepared.
+  SHIPPED // Order has been shipped.
+  DELIVERED // Order has been delivered.
+  CANCELLED // Order was cancelled.
 }
 
 /// Defines the standard clothing sizes.
@@ -88,11 +88,11 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   /// Relations
-  accounts      Account[]
-  sessions      Session[]
-  orders        Order[]
-  addresses     Address[]
-  reviews       Review[]
+  accounts  Account[]
+  sessions  Session[]
+  orders    Order[]
+  addresses Address[]
+  reviews   Review[]
 }
 
 /// Used for "magic link" email sign-ins.
@@ -110,13 +110,13 @@ model VerificationToken {
 
 /// Represents a product category.
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   /// Relations
-  products  Product[]
+  products Product[]
 }
 
 /// This is the base product, like "Classic T-Shirt".
@@ -125,33 +125,31 @@ model Product {
   id          String   @id @default(cuid())
   name        String
   description String
-  tag         String?   // Optional: For 'New Arrival', 'Best Seller', etc.
-  rating      Float?    // Optional: For star ratings, e.g., 4.5
+  tag         String? // Optional: For 'New Arrival', 'Best Seller', etc.
+  rating      Float? // Optional: For star ratings, e.g., 4.5
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   /// Relations
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  variants    ProductVariant[]
-  reviews     Review[]
+  categoryId String
+  category   Category         @relation(fields: [categoryId], references: [id])
+  variants   ProductVariant[]
+  reviews    Review[]
 }
 
 /// This represents a specific version of a product, e.g.,
 /// "Classic T-Shirt, Blue, Size M". This is what users add to the cart.
 model ProductVariant {
-  id        String   @id @default(cuid())
-  color     String   // e.g., "Blue", "#0000FF"
-  size      Size
-  price     Float    // Price for this specific variant
-  stock     Int      // Inventory count for this variant
-  images    String[] // List of image URLs for this variant
-  lemonSqueezyVariantId String // ✅ Add this line
-
+  id     String   @id @default(cuid())
+  color  String // e.g., "Blue", "#0000FF"
+  size   Size
+  price  Float // Price for this specific variant
+  stock  Int // Inventory count for this variant
+  images String[] // List of image URLs for this variant
 
   /// Relations
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 
   @@unique([productId, color, size]) // Ensures no duplicate variants
@@ -159,61 +157,67 @@ model ProductVariant {
 
 /// Represents a customer's order.
 model Order {
-  id              String      @id @default(cuid())
-  total           Float
-  status          OrderStatus @default(PENDING)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  
+  id        String      @id @default(cuid())
+  total     Float
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
   /// Relations
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  items           OrderItem[]
+  userId            String
+  user              User        @relation(fields: [userId], references: [id])
+  items             OrderItem[]
   shippingAddressId String
-  shippingAddress Address     @relation(fields: [shippingAddressId], references: [id])
+  shippingAddress   Address     @relation(fields: [shippingAddressId], references: [id])
+
+  // Razorpay Fields
+  razorpayOrderId   String? @unique
+  razorpayPaymentId String? @unique
+  razorpaySignature String?
 }
 
 /// A specific item within an order.
 model OrderItem {
-  id        String   @id @default(cuid())
-  quantity  Int
-  price     Float    // Price of the variant at the time of purchase
+  id       String @id @default(cuid())
+  quantity Int
+  price    Float // Price of the variant at the time of purchase
 
   /// Relations
-  orderId     String
-  order       Order    @relation(fields: [orderId], references: [id])
-  variantId   String
-  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id])
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
 }
 
 /// Represents a user's review of a product.
 model Review {
   id        String   @id @default(cuid())
-  rating    Int      // e.g., 1 to 5
+  rating    Int // e.g., 1 to 5
   comment   String?
   createdAt DateTime @default(now())
 
   /// Relations
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 
   @@unique([userId, productId]) // A user can only review a product once
 }
 
 /// Represents a user's saved shipping address.
 model Address {
-  id          String   @id @default(cuid())
-  street      String
-  city        String
-  state       String
-  zipCode     String
-  country     String
-  isDefault   Boolean  @default(false)
-  
+  id        String  @id @default(cuid())
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  country   String
+  mobile    String? // Mobile number for Razorpay authentication (optional for backward compatibility)
+  isDefault Boolean @default(false)
+
   /// Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  orders      Order[]
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  orders Order[]
 }
