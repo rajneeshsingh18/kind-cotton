@@ -6,7 +6,6 @@ import { useCartStore } from "@/store/cart.store";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 
 // Utility to format currency
 const formatPrice = (price: number) =>

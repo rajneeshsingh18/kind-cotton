@@ -154,7 +154,14 @@ export async function POST(req: Request) {
 
     // Create Razorpay Order
     console.log('[RAZORPAY_ORDER_POST] Creating Razorpay order...');
-    const orderData: any = {
+    interface RazorpayOrderData {
+      amount: number;
+      currency: string;
+      receipt: string;
+      customer_id?: string;
+    }
+    
+    const orderData: RazorpayOrderData = {
       amount: Math.round(total * 100), // Amount in paise
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
