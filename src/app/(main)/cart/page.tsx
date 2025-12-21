@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart.store";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Utility to format currency
@@ -97,9 +97,7 @@ export default function CartPage() {
               size="lg"
               className="w-full mt-4 rounded-full"
               onClick={handleCheckout}
-              disabled={isLoading}
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Proceed to Checkout
             </Button>
             <p className="text-xs text-gray-500 text-center">

@@ -51,14 +51,13 @@ export async function POST(req: Request) {
             count: 1,
           });
           
-          interface RazorpayCustomer {
-            id: string;
-            contact?: string;
-          }
-          
           // Find customer with matching contact
+          // Note: Razorpay's contact can be string | number, so we convert to string for comparison
           const matchingCustomer = customers.items?.find(
-            (customer: RazorpayCustomer) => customer.contact === mobile
+            (customer) => {
+              const customerContact = customer.contact?.toString();
+              return customerContact === mobile;
+            }
           );
           
           if (matchingCustomer) {

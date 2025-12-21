@@ -7,6 +7,7 @@ import { Role } from "@prisma/client"
 import db from "@/lib/db"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // @ts-expect-error - Type compatibility issue between NextAuth v5 beta and PrismaAdapter
   adapter: PrismaAdapter(db),
   providers: [
     Google({

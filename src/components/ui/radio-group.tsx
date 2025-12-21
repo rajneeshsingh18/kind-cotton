@@ -22,10 +22,11 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
             interface ChildProps {
               value?: string;
             }
+            const childProps = child.props as ChildProps;
             return React.cloneElement(child as React.ReactElement<ChildProps>, {
-              checked: child.props.value === value,
-              onClick: () => onValueChange?.(child.props.value || ''),
-            })
+              checked: childProps.value === value,
+              onClick: () => onValueChange?.(childProps.value || ''),
+            } as Partial<ChildProps>)
           }
           return child
         })}

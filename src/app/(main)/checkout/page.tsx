@@ -102,7 +102,25 @@ export default function CheckoutPage() {
         };
       }
 
-      const options = {
+      interface RazorpayOptions {
+        key: string;
+        amount: number;
+        currency: string;
+        name: string;
+        description: string;
+        order_id: string;
+        handler: (response: RazorpayResponse) => Promise<void>;
+        prefill: {
+          name?: string;
+          email?: string;
+          contact?: string;
+        };
+        theme: {
+          color: string;
+        };
+      }
+
+      const options: RazorpayOptions = {
         key: data.key,
         amount: data.amount,
         currency: data.currency,
@@ -140,7 +158,7 @@ export default function CheckoutPage() {
       };
 
       interface RazorpayWindow extends Window {
-        Razorpay: new (options: typeof options) => {
+        Razorpay: new (options: RazorpayOptions) => {
           open: () => void;
           on: (event: string, handler: (response: RazorpayError) => void) => void;
         };
