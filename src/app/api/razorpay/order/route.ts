@@ -111,30 +111,41 @@ export async function POST(req: Request) {
       const razorpayCustomer = await razorpay.customers.create(customerData);
       razorpayCustomerId = razorpayCustomer.id;
       console.log('[RAZORPAY_CUSTOMER_CREATE] Customer created successfully:', razorpayCustomerId);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      interface RazorpayError {
+        statusCode?: number;
+        error?: {
+          code?: string;
+          description?: string;
+        };
+        message?: string;
+      }
+      
+      const razorpayError = error as RazorpayError;
+      
       console.error('[RAZORPAY_CUSTOMER_CREATE] Error details:', {
-        statusCode: error.statusCode,
-        errorCode: error.error?.code,
-        errorDescription: error.error?.description,
-        message: error.message,
-        fullError: JSON.stringify(error, null, 2)
+        statusCode: razorpayError.statusCode,
+        errorCode: razorpayError.error?.code,
+        errorDescription: razorpayError.error?.description,
+        message: razorpayError.message,
+        fullError: JSON.stringify(razorpayError, null, 2)
       });
       
       // If it's an authentication error, throw it immediately
-      if (error.statusCode === 401) {
+      if (razorpayError.statusCode === 401) {
         console.error('[RAZORPAY_CUSTOMER_CREATE] Authentication failed - check your API keys');
         return new NextResponse(
           JSON.stringify({ 
             error: 'Razorpay authentication failed', 
             message: 'Please check your Razorpay API credentials',
-            details: error.error?.description || error.message 
+            details: razorpayError.error?.description || razorpayError.message 
           }),
           { status: 401, headers: { 'Content-Type': 'application/json' } }
         );
       }
       
       // If it's a duplicate customer error, we can proceed without customer_id
-      if (error.statusCode === 400 && error.error?.code === 'BAD_REQUEST_ERROR') {
+      if (razorpayError.statusCode === 400 && razorpayError.error?.code === 'BAD_REQUEST_ERROR') {
         console.warn('[RAZORPAY_CUSTOMER_CREATE] Customer may already exist, proceeding without customer_id');
       } else {
         console.warn('[RAZORPAY_CUSTOMER_CREATE] Customer creation failed, proceeding with order creation');
@@ -163,21 +174,32 @@ export async function POST(req: Request) {
     try {
       razorpayOrder = await razorpay.orders.create(orderData);
       console.log('[RAZORPAY_ORDER_CREATE] Order created successfully:', razorpayOrder.id);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      interface RazorpayError {
+        statusCode?: number;
+        error?: {
+          code?: string;
+          description?: string;
+        };
+        message?: string;
+      }
+      
+      const razorpayError = error as RazorpayError;
+      
       console.error('[RAZORPAY_ORDER_CREATE] Error details:', {
-        statusCode: error.statusCode,
-        errorCode: error.error?.code,
-        errorDescription: error.error?.description,
-        message: error.message,
-        fullError: JSON.stringify(error, null, 2)
+        statusCode: razorpayError.statusCode,
+        errorCode: razorpayError.error?.code,
+        errorDescription: razorpayError.error?.description,
+        message: razorpayError.message,
+        fullError: JSON.stringify(razorpayError, null, 2)
       });
       
-      if (error.statusCode === 401) {
+      if (razorpayError.statusCode === 401) {
         return new NextResponse(
           JSON.stringify({ 
             error: 'Razorpay authentication failed', 
             message: 'Please check your Razorpay API credentials',
-            details: error.error?.description || error.message 
+            details: razorpayError.error?.description || razorpayError.message 
           }),
           { status: 401, headers: { 'Content-Type': 'application/json' } }
         );
@@ -211,18 +233,21 @@ export async function POST(req: Request) {
       key: process.env.RAZORPAY_KEY_ID,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create order';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     console.error('[RAZORPAY_ORDER_POST] Unexpected error:', {
-      message: error.message,
-      stack: error.stack,
+      message: errorMessage,
+      stack: errorStack,
       fullError: JSON.stringify(error, null, 2)
     });
     
     return new NextResponse(
       JSON.stringify({ 
         error: 'Internal Error', 
-        message: error.message || 'Failed to create order',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        message: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? errorStack : undefined
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );

@@ -55,19 +55,31 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       // Fetch address to get mobile number for prefill
-      let addressData = null;
+      interface AddressData {
+        id: string;
+        mobile?: string;
+      }
+      
+      let addressData: AddressData | null = null;
       try {
         const addressRes = await fetch('/api/address');
         if (addressRes.ok) {
-          const addresses = await addressRes.json();
-          addressData = addresses.find((addr: any) => addr.id === selectedAddressId);
+          const addresses: AddressData[] = await addressRes.json();
+          addressData = addresses.find((addr) => addr.id === selectedAddressId) || null;
         }
       } catch (error) {
         console.error('Failed to fetch address for prefill', error);
       }
 
       // Fetch user session for name and email
-      let userData = null;
+      interface UserData {
+        user?: {
+          name?: string;
+          email?: string;
+        };
+      }
+      
+      let userData: UserData | null = null;
       try {
         const userRes = await fetch('/api/auth/session');
         if (userRes.ok) {
@@ -77,6 +89,19 @@ export default function CheckoutPage() {
         console.error('Failed to fetch user data for prefill', error);
       }
 
+      interface RazorpayResponse {
+        razorpay_order_id: string;
+        razorpay_payment_id: string;
+        razorpay_signature: string;
+      }
+
+      interface RazorpayError {
+        error?: {
+          code?: string;
+          description?: string;
+        };
+      }
+
       const options = {
         key: data.key,
         amount: data.amount,
@@ -84,7 +109,7 @@ export default function CheckoutPage() {
         name: 'Kind Cotton',
         description: 'Purchase from Kind Cotton',
         order_id: data.razorpayOrderId,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpayResponse) {
           // Verify Payment
           const verifyRes = await fetch('/api/razorpay/verify', {
             method: 'POST',
@@ -114,16 +139,24 @@ export default function CheckoutPage() {
         },
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
-      paymentObject.on('payment.failed', function (response: any) {
+      interface RazorpayWindow extends Window {
+        Razorpay: new (options: typeof options) => {
+          open: () => void;
+          on: (event: string, handler: (response: RazorpayError) => void) => void;
+        };
+      }
+
+      const paymentObject = new (window as unknown as RazorpayWindow).Razorpay(options);
+      paymentObject.on('payment.failed', function (response: RazorpayError) {
         console.error('Payment failed', response);
         alert('Payment failed. Please try again.');
         setIsProcessing(false);
       });
       paymentObject.open();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Payment failed', error);
-      alert(error.message || 'Payment failed. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed. Please try again.';
+      alert(errorMessage);
       setIsProcessing(false);
     }
   };

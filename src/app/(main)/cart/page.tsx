@@ -17,7 +17,6 @@ const formatPrice = (price: number) =>
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity } = useCartStore();
-  const [isLoading, setIsLoading] = useState(false);
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shippingCost = subtotal > 500 ? 0 : 50;

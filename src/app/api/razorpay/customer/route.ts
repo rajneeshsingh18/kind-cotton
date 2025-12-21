@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
 import Razorpay from 'razorpay';
 
 const razorpay = new Razorpay({
@@ -34,18 +33,32 @@ export async function POST(req: Request) {
         contact: mobile,
         fail_existing: 0, // Don't fail if customer already exists
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      interface RazorpayError {
+        statusCode?: number;
+        error?: {
+          description?: string;
+        };
+      }
+      
+      const razorpayError = error as RazorpayError;
+      
       // If customer already exists, try to fetch by contact
-      if (error.statusCode === 400 && error.error?.description?.includes('already exists')) {
+      if (razorpayError.statusCode === 400 && razorpayError.error?.description?.includes('already exists')) {
         // Search for existing customer by contact
         try {
           const customers = await razorpay.customers.all({
             count: 1,
           });
           
+          interface RazorpayCustomer {
+            id: string;
+            contact?: string;
+          }
+          
           // Find customer with matching contact
           const matchingCustomer = customers.items?.find(
-            (customer: any) => customer.contact === mobile
+            (customer: RazorpayCustomer) => customer.contact === mobile
           );
           
           if (matchingCustomer) {
@@ -76,11 +89,13 @@ export async function POST(req: Request) {
       customerId: razorpayCustomer.id,
       contact: razorpayCustomer.contact,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[RAZORPAY_CUSTOMER_POST]', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create Razorpay customer';
+    const statusCode = (error as { statusCode?: number })?.statusCode || 500;
     return new NextResponse(
-      error.message || 'Failed to create Razorpay customer',
-      { status: error.statusCode || 500 }
+      errorMessage,
+      { status: statusCode }
     );
   }
 }
