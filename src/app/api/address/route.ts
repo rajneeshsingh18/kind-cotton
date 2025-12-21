@@ -9,6 +9,7 @@ const addressSchema = z.object({
   state: z.string().min(1, 'State is required'),
   zipCode: z.string().min(1, 'Zip Code is required'),
   country: z.string().min(1, 'Country is required'),
+  mobile: z.string().min(10, 'Mobile number is required').regex(/^[0-9]{10}$/, 'Mobile number must be 10 digits'),
   isDefault: z.boolean().optional(),
 });
 

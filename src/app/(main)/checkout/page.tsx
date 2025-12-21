@@ -48,10 +48,34 @@ export default function CheckoutPage() {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to create order');
+        const errorData = await res.json().catch(() => ({ message: 'Failed to create order' }));
+        throw new Error(errorData.message || 'Failed to create order');
       }
 
       const data = await res.json();
+
+      // Fetch address to get mobile number for prefill
+      let addressData = null;
+      try {
+        const addressRes = await fetch('/api/address');
+        if (addressRes.ok) {
+          const addresses = await addressRes.json();
+          addressData = addresses.find((addr: any) => addr.id === selectedAddressId);
+        }
+      } catch (error) {
+        console.error('Failed to fetch address for prefill', error);
+      }
+
+      // Fetch user session for name and email
+      let userData = null;
+      try {
+        const userRes = await fetch('/api/auth/session');
+        if (userRes.ok) {
+          userData = await userRes.json();
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data for prefill', error);
+      }
 
       const options = {
         key: data.key,
@@ -76,11 +100,14 @@ export default function CheckoutPage() {
             clearCart();
             router.push('/checkout/success');
           } else {
+            const errorData = await verifyRes.json().catch(() => ({ message: 'Payment verification failed' }));
+            alert(errorData.message || 'Payment verification failed. Please contact support.');
           }
         },
         prefill: {
-          // name: session.user.name, // We could pass this if we had session here
-          // email: session.user.email,
+          name: userData?.user?.name || undefined,
+          email: userData?.user?.email || undefined,
+          contact: addressData?.mobile || undefined,
         },
         theme: {
           color: '#3399cc',
@@ -88,10 +115,15 @@ export default function CheckoutPage() {
       };
 
       const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.on('payment.failed', function (response: any) {
+        console.error('Payment failed', response);
+        alert('Payment failed. Please try again.');
+        setIsProcessing(false);
+      });
       paymentObject.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment failed', error);
-    } finally {
+      alert(error.message || 'Payment failed. Please try again.');
       setIsProcessing(false);
     }
   };

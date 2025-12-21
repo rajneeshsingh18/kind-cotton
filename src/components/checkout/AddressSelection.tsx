@@ -17,9 +17,10 @@ const addressSchema = z.object({
   state: z.string().min(1, 'State is required'),
   zipCode: z.string().min(1, 'Zip Code is required'),
   country: z.string().min(1, 'Country is required'),
+  mobile: z.string().min(10, 'Mobile number is required').regex(/^[0-9]{10}$/, 'Mobile number must be 10 digits'),
 });
 
-type Address = z.infer<typeof addressSchema> & { id: string; isDefault: boolean };
+type Address = z.infer<typeof addressSchema> & { id: string; isDefault: boolean; mobile?: string };
 
 interface AddressSelectionProps {
   onSelect: (addressId: string) => void;
@@ -76,13 +77,14 @@ export default function AddressSelection({ onSelect }: AddressSelectionProps) {
         onSelect(newAddress.id);
         setIsAddingNew(false);
         form.reset();
-        
       } else {
-        
+        const errorData = await res.json().catch(() => ({ message: 'Failed to add address' }));
+        console.error('Failed to add address', errorData);
+        alert(errorData.message || 'Failed to add address. Please try again.');
       }
     } catch (error) {
       console.error('Failed to add address', error);
-
+      alert('Failed to add address. Please try again.');
     }
   };
 
@@ -144,6 +146,13 @@ export default function AddressSelection({ onSelect }: AddressSelectionProps) {
                     <p className="text-sm text-red-500">{form.formState.errors.country.message}</p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="mobile">Mobile Number</Label>
+                  <Input id="mobile" type="tel" placeholder="10 digit mobile number" {...form.register('mobile')} />
+                  {form.formState.errors.mobile && (
+                    <p className="text-sm text-red-500">{form.formState.errors.mobile.message}</p>
+                  )}
+                </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="ghost" onClick={() => setIsAddingNew(false)}>
@@ -157,23 +166,58 @@ export default function AddressSelection({ onSelect }: AddressSelectionProps) {
             </form>
           </CardContent>
         </Card>
+      ) : addresses.length === 0 ? (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground mb-4">No addresses found. Please add a new address.</p>
+            <Button variant="outline" onClick={() => setIsAddingNew(true)} className="w-full">
+              <Plus className="w-4 h-4 mr-2" /> Add Address
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
-        <RadioGroup value={selectedId} onValueChange={(val : any) => { setSelectedId(val); onSelect(val); }}>
-          <div className="grid grid-cols-1 gap-4">
-            {addresses.map((address) => (
-              <div key={address.id} className={`relative flex items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm ${selectedId === address.id ? 'border-primary ring-1 ring-primary' : ''}`}>
-                <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
-                <Label htmlFor={address.id} className="font-normal cursor-pointer w-full">
-                  <div className="font-medium">{address.street}</div>
-                  <div className="text-muted-foreground">
-                    {address.city}, {address.state} {address.zipCode}
-                  </div>
-                  <div className="text-muted-foreground">{address.country}</div>
-                </Label>
+        <div className="grid grid-cols-1 gap-4">
+          {addresses.map((address) => (
+            <div 
+              key={address.id} 
+              className={`relative flex items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm cursor-pointer transition-colors ${
+                selectedId === address.id ? 'border-primary ring-2 ring-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
+              }`}
+              onClick={() => {
+                setSelectedId(address.id);
+                onSelect(address.id);
+              }}
+            >
+              <div className="mt-1">
+                <input
+                  type="radio"
+                  name="address"
+                  value={address.id}
+                  id={address.id}
+                  checked={selectedId === address.id}
+                  onChange={() => {
+                    setSelectedId(address.id);
+                    onSelect(address.id);
+                  }}
+                  className="h-4 w-4 cursor-pointer"
+                />
               </div>
-            ))}
-          </div>
-        </RadioGroup>
+              <Label 
+                htmlFor={address.id} 
+                className="font-normal cursor-pointer w-full"
+              >
+                <div className="font-medium">{address.street}</div>
+                <div className="text-muted-foreground">
+                  {address.city}, {address.state} {address.zipCode}
+                </div>
+                <div className="text-muted-foreground">{address.country}</div>
+                {address.mobile && (
+                  <div className="text-muted-foreground">Mobile: {address.mobile}</div>
+                )}
+              </Label>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
