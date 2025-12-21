@@ -146,7 +146,6 @@ model ProductVariant {
   price     Float    // Price for this specific variant
   stock     Int      // Inventory count for this variant
   images    String[] // List of image URLs for this variant
-  lemonSqueezyVariantId String // ✅ Add this line
 
 
   /// Relations
@@ -171,6 +170,11 @@ model Order {
   items           OrderItem[]
   shippingAddressId String
   shippingAddress Address     @relation(fields: [shippingAddressId], references: [id])
+
+  // Razorpay Fields
+  razorpayOrderId   String?   @unique
+  razorpayPaymentId String?   @unique
+  razorpaySignature String?
 }
 
 /// A specific item within an order.

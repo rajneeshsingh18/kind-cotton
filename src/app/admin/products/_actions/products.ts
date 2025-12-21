@@ -54,7 +54,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
           create: variantsResult.data.map(variant => ({
             ...variant,
             images: [variant.images], // Wrap the single image URL in an array
-            lemonSqueezyVariantId: "placeholder", // We'll handle this later
+
           })),
         },
       },
@@ -147,7 +147,7 @@ export async function updateProduct(productId: string, prevState: unknown, formD
             price: variant.price,
             stock: variant.stock,
             images: [variant.images],
-            lemonSqueezyVariantId: "placeholder",
+
           })),
         });
       }
