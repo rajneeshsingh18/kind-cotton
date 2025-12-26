@@ -27,7 +27,7 @@ const getRazorpayInstance = () => {
 export async function POST(req: Request) {
   try {
     console.log('[RAZORPAY_ORDER_POST] Starting order creation...');
-    
+
     const session = await auth();
     if (!session?.user) {
       console.error('[RAZORPAY_ORDER_POST] No session found');
@@ -60,9 +60,9 @@ export async function POST(req: Request) {
     if (!address.mobile) {
       return new NextResponse('Mobile number is required in shipping address. Please update your address with a mobile number.', { status: 400 });
     }
-    
+
     if (!items || items.length === 0) {
-       return new NextResponse('No items in checkout', { status: 400 });
+      return new NextResponse('No items in checkout', { status: 400 });
     }
 
     console.log('[RAZORPAY_ORDER_POST] Calculating order total...');
@@ -101,11 +101,11 @@ export async function POST(req: Request) {
         email: session.user.email || undefined,
         contact: address.mobile,
       };
-      
-      console.log('[RAZORPAY_CUSTOMER_CREATE] Customer data:', { 
-        name: customerData.name, 
-        email: customerData.email, 
-        contact: customerData.contact 
+
+      console.log('[RAZORPAY_CUSTOMER_CREATE] Customer data:', {
+        name: customerData.name,
+        email: customerData.email,
+        contact: customerData.contact
       });
 
       const razorpayCustomer = await razorpay.customers.create(customerData);
@@ -119,20 +119,20 @@ export async function POST(req: Request) {
         message: error.message,
         fullError: JSON.stringify(error, null, 2)
       });
-      
+
       // If it's an authentication error, throw it immediately
       if (error.statusCode === 401) {
         console.error('[RAZORPAY_CUSTOMER_CREATE] Authentication failed - check your API keys');
         return new NextResponse(
-          JSON.stringify({ 
-            error: 'Razorpay authentication failed', 
+          JSON.stringify({
+            error: 'Razorpay authentication failed',
             message: 'Please check your Razorpay API credentials',
-            details: error.error?.description || error.message 
+            details: error.error?.description || error.message
           }),
           { status: 401, headers: { 'Content-Type': 'application/json' } }
         );
       }
-      
+
       // If it's a duplicate customer error, we can proceed without customer_id
       if (error.statusCode === 400 && error.error?.code === 'BAD_REQUEST_ERROR') {
         console.warn('[RAZORPAY_CUSTOMER_CREATE] Customer may already exist, proceeding without customer_id');
@@ -143,12 +143,17 @@ export async function POST(req: Request) {
 
     // Create Razorpay Order
     console.log('[RAZORPAY_ORDER_POST] Creating Razorpay order...');
-    const orderData: any = {
+    const orderData: {
+      amount: number;
+      currency: string;
+      receipt: string;
+      customer_id?: string;
+    } = {
       amount: Math.round(total * 100), // Amount in paise
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
     };
-    
+
     // Add customer_id if we successfully created/found the customer
     if (razorpayCustomerId) {
       orderData.customer_id = razorpayCustomerId;
@@ -156,9 +161,9 @@ export async function POST(req: Request) {
     } else {
       console.log('[RAZORPAY_ORDER_POST] Proceeding without customer_id');
     }
-    
+
     console.log('[RAZORPAY_ORDER_CREATE] Order data:', orderData);
-    
+
     let razorpayOrder;
     try {
       razorpayOrder = await razorpay.orders.create(orderData);
@@ -171,18 +176,18 @@ export async function POST(req: Request) {
         message: error.message,
         fullError: JSON.stringify(error, null, 2)
       });
-      
+
       if (error.statusCode === 401) {
         return new NextResponse(
-          JSON.stringify({ 
-            error: 'Razorpay authentication failed', 
+          JSON.stringify({
+            error: 'Razorpay authentication failed',
             message: 'Please check your Razorpay API credentials',
-            details: error.error?.description || error.message 
+            details: error.error?.description || error.message
           }),
           { status: 401, headers: { 'Content-Type': 'application/json' } }
         );
       }
-      
+
       throw error;
     }
 
@@ -217,10 +222,10 @@ export async function POST(req: Request) {
       stack: error.stack,
       fullError: JSON.stringify(error, null, 2)
     });
-    
+
     return new NextResponse(
-      JSON.stringify({ 
-        error: 'Internal Error', 
+      JSON.stringify({
+        error: 'Internal Error',
         message: error.message || 'Failed to create order',
         details: process.env.NODE_ENV === 'development' ? error.stack : undefined
       }),

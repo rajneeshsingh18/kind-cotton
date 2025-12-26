@@ -60,7 +60,7 @@ export default function CheckoutPage() {
         const addressRes = await fetch('/api/address');
         if (addressRes.ok) {
           const addresses = await addressRes.json();
-          addressData = addresses.find((addr: any) => addr.id === selectedAddressId);
+          addressData = addresses.find((addr: { id: string; mobile?: string }) => addr.id === selectedAddressId);
         }
       } catch (error) {
         console.error('Failed to fetch address for prefill', error);
@@ -84,7 +84,7 @@ export default function CheckoutPage() {
         name: 'Kind Cotton',
         description: 'Purchase from Kind Cotton',
         order_id: data.razorpayOrderId,
-        handler: async function (response: any) {
+        handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
           // Verify Payment
           const verifyRes = await fetch('/api/razorpay/verify', {
             method: 'POST',
@@ -114,16 +114,17 @@ export default function CheckoutPage() {
         },
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
+      const paymentObject = new (window as unknown as { Razorpay: new (options: any) => any }).Razorpay(options);
       paymentObject.on('payment.failed', function (response: any) {
         console.error('Payment failed', response);
         alert('Payment failed. Please try again.');
         setIsProcessing(false);
       });
       paymentObject.open();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Payment failed', error);
-      alert(error.message || 'Payment failed. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed. Please try again.';
+      alert(errorMessage);
       setIsProcessing(false);
     }
   };
@@ -131,7 +132,7 @@ export default function CheckoutPage() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
           <AddressSelection onSelect={setSelectedAddressId} />
@@ -153,9 +154,9 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <Button 
-              className="w-full" 
-              onClick={handlePayment} 
+            <Button
+              className="w-full"
+              onClick={handlePayment}
               disabled={isProcessing || !selectedAddressId || cartItems.length === 0}
             >
               {isProcessing ? (

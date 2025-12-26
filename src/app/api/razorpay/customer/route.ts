@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+// import { prisma } from '@/lib/db';
 import Razorpay from 'razorpay';
 
 const razorpay = new Razorpay({
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     // Create or fetch Razorpay customer
     // First, try to find existing customer by contact (mobile)
     let razorpayCustomer;
-    
+
     try {
       // Try to create a new customer
       razorpayCustomer = await razorpay.customers.create({
@@ -42,12 +42,12 @@ export async function POST(req: Request) {
           const customers = await razorpay.customers.all({
             count: 1,
           });
-          
+
           // Find customer with matching contact
           const matchingCustomer = customers.items?.find(
-            (customer: any) => customer.contact === mobile
+            (customer: { contact?: string | number }) => String(customer.contact) === mobile
           );
-          
+
           if (matchingCustomer) {
             razorpayCustomer = matchingCustomer;
           } else {

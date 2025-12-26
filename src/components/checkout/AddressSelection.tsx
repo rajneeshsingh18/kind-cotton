@@ -37,30 +37,30 @@ export default function AddressSelection({ onSelect }: AddressSelectionProps) {
   });
 
   useEffect(() => {
-    fetchAddresses();
-  }, []);
-
-  const fetchAddresses = async () => {
-    try {
-      const res = await fetch('/api/address');
-      if (res.ok) {
-        const data = await res.json();
-        setAddresses(data);
-        const defaultAddress = data.find((a: Address) => a.isDefault);
-        if (defaultAddress) {
-          setSelectedId(defaultAddress.id);
-          onSelect(defaultAddress.id);
-        } else if (data.length > 0) {
-          setSelectedId(data[0].id);
-          onSelect(data[0].id);
+    const fetchAddresses = async () => {
+      try {
+        const res = await fetch('/api/address');
+        if (res.ok) {
+          const data = await res.json();
+          setAddresses(data);
+          const defaultAddress = data.find((a: Address) => a.isDefault);
+          if (defaultAddress) {
+            setSelectedId(defaultAddress.id);
+            onSelect(defaultAddress.id);
+          } else if (data.length > 0) {
+            setSelectedId(data[0].id);
+            onSelect(data[0].id);
+          }
         }
+      } catch (error) {
+        console.error('Failed to fetch addresses', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to fetch addresses', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    fetchAddresses();
+  }, [onSelect]);
 
   const onSubmit = async (data: z.infer<typeof addressSchema>) => {
     try {
@@ -178,11 +178,10 @@ export default function AddressSelection({ onSelect }: AddressSelectionProps) {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {addresses.map((address) => (
-            <div 
-              key={address.id} 
-              className={`relative flex items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm cursor-pointer transition-colors ${
-                selectedId === address.id ? 'border-primary ring-2 ring-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
-              }`}
+            <div
+              key={address.id}
+              className={`relative flex items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm cursor-pointer transition-colors ${selectedId === address.id ? 'border-primary ring-2 ring-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
+                }`}
               onClick={() => {
                 setSelectedId(address.id);
                 onSelect(address.id);
@@ -202,8 +201,8 @@ export default function AddressSelection({ onSelect }: AddressSelectionProps) {
                   className="h-4 w-4 cursor-pointer"
                 />
               </div>
-              <Label 
-                htmlFor={address.id} 
+              <Label
+                htmlFor={address.id}
                 className="font-normal cursor-pointer w-full"
               >
                 <div className="font-medium">{address.street}</div>

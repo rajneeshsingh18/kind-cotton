@@ -1,7 +1,8 @@
 import { PrismaClient, Size } from "@prisma/client";
 
-// Initialize Prisma Client
-const db = new PrismaClient();
+const db = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+});
 
 async function main() {
   console.log("🌱 Starting seed process...");

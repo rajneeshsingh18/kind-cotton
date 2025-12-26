@@ -24,6 +24,7 @@ export default function CartPage() {
   const total = subtotal + shippingCost;
 
   const handleCheckout = () => {
+    setIsLoading(true);
     // Redirect to internal checkout page
     window.location.href = '/checkout';
   };
@@ -78,7 +79,7 @@ export default function CartPage() {
                       <div className="text-lg font-semibold">{formatPrice(item.price * item.quantity)}</div>
                     </div>
                   </div>
-                   <div className="self-start sm:self-center">
+                  <div className="self-start sm:self-center">
                     <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="hover:bg-red-50">
                       <Trash2 className="h-5 w-5 text-red-500" />
                     </Button>
