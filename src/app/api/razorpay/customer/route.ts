@@ -76,11 +76,13 @@ export async function POST(req: Request) {
       customerId: razorpayCustomer.id,
       contact: razorpayCustomer.contact,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[RAZORPAY_CUSTOMER_POST]', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create Razorpay customer';
+    const statusCode = (error as { statusCode?: number }).statusCode || 500;
     return new NextResponse(
-      error.message || 'Failed to create Razorpay customer',
-      { status: error.statusCode || 500 }
+      errorMessage,
+      { status: statusCode }
     );
   }
 }

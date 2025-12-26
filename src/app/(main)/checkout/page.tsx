@@ -114,7 +114,7 @@ export default function CheckoutPage() {
         },
       };
 
-      const paymentObject = new (window as unknown as { Razorpay: new (options: any) => any }).Razorpay(options);
+      const paymentObject = new (window as unknown as { Razorpay: new (options: Record<string, unknown>) => any }).Razorpay(options);
       paymentObject.on('payment.failed', function (response: any) {
         console.error('Payment failed', response);
         alert('Payment failed. Please try again.');
@@ -124,6 +124,15 @@ export default function CheckoutPage() {
     } catch (error: unknown) {
       console.error('Payment failed', error);
       const errorMessage = error instanceof Error ? error.message : 'Payment failed. Please try again.';
+
+      // Handle "Variant not found" error (stale cart)
+      if (errorMessage.includes('Variant not found')) {
+        alert('Some items in your cart are no longer available. Your cart has been cleared.');
+        clearCart();
+        router.push('/products');
+        return;
+      }
+
       alert(errorMessage);
       setIsProcessing(false);
     }
