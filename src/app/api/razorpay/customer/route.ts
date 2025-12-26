@@ -34,9 +34,10 @@ export async function POST(req: Request) {
         contact: mobile,
         fail_existing: 0, // Don't fail if customer already exists
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { statusCode?: number; error?: { description?: string } };
       // If customer already exists, try to fetch by contact
-      if (error.statusCode === 400 && error.error?.description?.includes('already exists')) {
+      if (err.statusCode === 400 && err.error?.description?.includes('already exists')) {
         // Search for existing customer by contact
         try {
           const customers = await razorpay.customers.all({

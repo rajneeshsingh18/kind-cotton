@@ -114,8 +114,29 @@ export default function CheckoutPage() {
         },
       };
 
-      const paymentObject = new (window as unknown as { Razorpay: new (options: Record<string, unknown>) => any }).Razorpay(options);
-      paymentObject.on('payment.failed', function (response: any) {
+      interface RazorpayErrorResponse {
+        error: {
+          code: string;
+          description: string;
+          source: string;
+          step: string;
+          reason: string;
+          metadata: {
+            order_id: string;
+            payment_id: string;
+          };
+        };
+      }
+
+      interface RazorpayInstance {
+        open: () => void;
+        on: (event: string, handler: (response: RazorpayErrorResponse) => void) => void;
+      }
+
+      const RazorpayConstructor = (window as unknown as { Razorpay: new (options: Record<string, unknown>) => RazorpayInstance }).Razorpay;
+      const paymentObject = new RazorpayConstructor(options);
+
+      paymentObject.on('payment.failed', function (response: RazorpayErrorResponse) {
         console.error('Payment failed', response);
         alert('Payment failed. Please try again.');
         setIsProcessing(false);
