@@ -1,41 +1,65 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export function DealsSection() {
-  const [timeLeft, setTimeLeft] = useState(12 * 3600 + 58 * 60); // 12 hours, 58 mins
+  const [timeLeft, setTimeLeft] = useState(12 * 3600 + 58 * 60);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const hours = Math.floor(timeLeft / 3600);
+  const hours   = Math.floor(timeLeft / 3600);
   const minutes = Math.floor((timeLeft % 3600) / 60);
   const seconds = timeLeft % 60;
 
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   return (
-    <section className="mb-12 bg-gray-100 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
+    <section className="mb-12 bg-kc-surface-low rounded-2xl px-8 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+      {/* Left — copy */}
       <div>
-        <h3 className="text-2xl font-bold">Limited-Time Deals</h3>
-        <p className="text-gray-600">Don&apos;t miss out on these special prices.</p>
+        <p className="kc-eco-badge inline-block mb-3">Limited Time</p>
+        <h3 className="font-display text-2xl font-bold text-kc-on-surface leading-tight">
+          Deals that don&apos;t last.
+        </h3>
+        <p className="mt-1 text-sm text-kc-on-surface-variant">
+          Prices drop at midnight — shop before the timer hits zero.
+        </p>
+        <Link
+          href="/products"
+          className="kc-btn-primary inline-flex items-center px-5 py-2.5 text-sm font-semibold mt-5"
+        >
+          Shop deals
+        </Link>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex gap-2 text-center">
-          <div className="bg-white p-3 rounded-md shadow-sm w-16">
-            <div className="text-2xl font-bold">{String(hours).padStart(2, '0')}</div>
-            <div className="text-xs text-gray-500">Hours</div>
+
+      {/* Right — countdown */}
+      <div className="flex items-center gap-3">
+        {[
+          { value: pad(hours),   label: "Hours" },
+          { value: pad(minutes), label: "Mins"  },
+          { value: pad(seconds), label: "Secs"  },
+        ].map(({ value, label }, i) => (
+          <div key={label} className="flex items-center gap-3">
+            <div className="bg-kc-surface-lowest rounded-2xl kc-shadow px-4 py-3 min-w-16 text-center">
+              <div className="font-display text-2xl font-bold text-kc-on-surface tabular-nums">
+                {value}
+              </div>
+              <div className="text-[10px] font-medium tracking-wide text-kc-on-surface-variant uppercase mt-0.5">
+                {label}
+              </div>
+            </div>
+            {i < 2 && (
+              <span className="font-display text-xl font-bold text-kc-on-surface-variant select-none">
+                :
+              </span>
+            )}
           </div>
-          <div className="bg-white p-3 rounded-md shadow-sm w-16">
-            <div className="text-2xl font-bold">{String(minutes).padStart(2, '0')}</div>
-            <div className="text-xs text-gray-500">Mins</div>
-          </div>
-          <div className="bg-white p-3 rounded-md shadow-sm w-16">
-            <div className="text-2xl font-bold">{String(seconds).padStart(2, '0')}</div>
-            <div className="text-xs text-gray-500">Secs</div>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );

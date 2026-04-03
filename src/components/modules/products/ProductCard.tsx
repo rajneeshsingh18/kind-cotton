@@ -4,11 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { ShoppingBag, Check, Eye } from "lucide-react";
+import { ShoppingBag, Check } from "lucide-react";
 
 import { useQuickView } from "@/hooks/use-quick-view";
 import { useCartStore } from "@/store/cart.store";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type ProductWithVariants = Prisma.ProductGetPayload<{
@@ -34,82 +33,90 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const itemToAdd = {
-      id: primaryVariant.id,
-      title: product.name,
-      price: primaryVariant.price,
-      img: primaryVariant.images[0] || "/images/placeholder.jpg",
-    };
-    addToCart(itemToAdd, 1);
-
+    addToCart(
+      {
+        id: primaryVariant.id,
+        title: product.name,
+        price: primaryVariant.price,
+        img: primaryVariant.images[0] || "/images/placeholder.jpg",
+      },
+      1
+    );
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
   };
 
   return (
-    <div className="group relative">
-      {/* 🔥 Neon Animated Border */}
-      <div className="animated-border">
-        <div className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300">
-          {/* Image Container */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
-            <Link href={`/products/${product.id}`} className="block w-full h-full">
-              <Image
-                src={primaryVariant.images[0] || "/images/placeholder.jpg"}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-            </Link>
-            {tag && (
-              <div className="absolute top-3 left-3 bg-white/90 text-slate-900 text-xs px-2 py-1 rounded-full font-semibold backdrop-blur-sm">
-                {tag}
-              </div>
-            )}
-            {/* Add to Cart Button */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] z-10">
-              <Button
-                onClick={handleAddToCart}
-                disabled={isAdded}
-                className={cn(
-                  "w-full opacity-0 group-hover:opacity-100 transition-all duration-300 text-white",
-                  isAdded
-                    ? "bg-blue-600 hover:bg-blue-700"
-                    : "bg-blue-500 hover:bg-blue-600"
-                )}
-              >
-                {isAdded ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" /> Added!
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4 mr-2" /> Add to cart
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
+    <div className="group relative bg-kc-surface-lowest rounded-2xl overflow-hidden kc-shadow transition-shadow duration-300 hover:shadow-[0_20px_56px_rgba(26,28,27,0.10)]">
+      {/* ── Image ──────────────────────────────────────────── */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-kc-surface-low">
+        <Link href={`/products/${product.id}`} className="block w-full h-full">
+          <Image
+            src={primaryVariant.images[0] || "/images/placeholder.jpg"}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-104"
+          />
+        </Link>
 
-          {/* Product Details */}
-          <div className="mt-4">
-            <h3 className="text-sm font-medium text-slate-800">
-              <Link href={`/products/${product.id}`}>{product.name}</Link>
-            </h3>
-            <div className="mt-2 flex items-center justify-between">
-              <p className="text-lg font-semibold text-slate-900">
-                {formatPrice(primaryVariant.price)}
-              </p>
-              <Button
-                variant="ghost"
-                className="h-8 w-26 rounded-10px"
-                onClick={() => openQuickView(product)}
-              >
-                <Eye className="h-5 w-5 text-gray-500" />
-                Quick View
-              </Button>
-            </div>
+        {/* Eco / tag badge */}
+        {tag && (
+          <div className="absolute top-3 left-3 kc-eco-badge">
+            {tag}
           </div>
+        )}
+
+        {/* Hover overlay — "Quick View" with backdrop blur */}
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 bg-(--kc-on-surface)/10 backdrop-blur-[2px]" />
+          <button
+            onClick={() => openQuickView(product)}
+            className="relative z-10 px-5 py-2 text-xs font-semibold tracking-wide text-white rounded-xl bg-(--kc-on-surface)/50 hover:bg-(--kc-on-surface)/70 transition-colors duration-200"
+          >
+            Quick View
+          </button>
+        </div>
+      </div>
+
+      {/* ── Details ────────────────────────────────────────── */}
+      <div className="px-4 pt-3 pb-4">
+        <h3 className="text-sm font-medium text-kc-on-surface leading-snug">
+          <Link
+            href={`/products/${product.id}`}
+            className="hover:text-kc-primary transition-colors duration-200"
+          >
+            {product.name}
+          </Link>
+        </h3>
+
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <p className="font-display text-base font-bold text-kc-on-surface">
+            {formatPrice(primaryVariant.price)}
+          </p>
+
+          {/* Add to Cart — primary gradient, appears on hover */}
+          <button
+            onClick={handleAddToCart}
+            disabled={isAdded}
+            className={cn(
+              "kc-btn-primary inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold",
+              "opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0",
+              "transition-all duration-300",
+              isAdded && "opacity-100 translate-y-0"
+            )}
+          >
+            {isAdded ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                Added
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-3.5 h-3.5" />
+                Add
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

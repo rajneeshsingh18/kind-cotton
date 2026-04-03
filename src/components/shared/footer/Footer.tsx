@@ -1,44 +1,53 @@
 import React from "react";
-import Link from "next/link"; // 1. Make sure Link is imported
-
+import Link from "next/link";
 import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Logo */}
-          <div className="text-lg font-semibold text-gray-800">
-            KindCotton
+    <footer className="bg-kc-surface-low mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          {/* Brand */}
+          <div>
+            <div className="font-display text-lg font-bold text-kc-on-surface">
+              KindCotton
+            </div>
+            <p className="mt-1 text-xs text-kc-on-surface-variant max-w-45 leading-relaxed">
+              Sustainable clothing crafted for everyday living.
+            </p>
           </div>
 
-          {/* Navigation Links */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
-            <Link href="/" className="hover:text-gray-900">Home</Link>
-            <Link href="/shop" className="hover:text-gray-900">Shop</Link>
-            <Link href="/about" className="hover:text-gray-900">About Us</Link>
-            <Link href="/contact" className="hover:text-gray-900">Contact</Link>
-            <Link href="/faq" className="hover:text-gray-900">FAQ</Link>
-          </div>
+          {/* Navigation */}
+          <nav className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-kc-on-surface-variant">
+            <Link href="/" className="hover:text-kc-on-surface transition-colors duration-200">Home</Link>
+            <Link href="/products" className="hover:text-kc-on-surface transition-colors duration-200">Shop</Link>
+            <Link href="/about" className="hover:text-kc-on-surface transition-colors duration-200">About Us</Link>
+            <Link href="/contact" className="hover:text-kc-on-surface transition-colors duration-200">Contact</Link>
+            <Link href="/faq" className="hover:text-kc-on-surface transition-colors duration-200">FAQ</Link>
+          </nav>
 
-          {/* Social Icons */}
-          <div className="flex gap-4 text-gray-500">
-            <Link href="#" aria-label="Facebook" className="hover:text-blue-600">
-              <FaFacebookF size={18} />
-            </Link>
-            <Link href="#" aria-label="Twitter" className="hover:text-sky-500">
-              <FaTwitter size={18} />
-            </Link>
-            <Link href="#" aria-label="Instagram" className="hover:text-pink-500">
-              <FaInstagram size={18} />
-            </Link>
+          {/* Social icons */}
+          <div className="flex gap-3">
+            {[
+              { Icon: FaFacebookF, href: "#", label: "Facebook" },
+              { Icon: FaTwitter, href: "#", label: "Twitter" },
+              { Icon: FaInstagram, href: "#", label: "Instagram" },
+            ].map(({ Icon, href, label }) => (
+              <Link
+                key={label}
+                href={href}
+                aria-label={label}
+                className="w-8 h-8 rounded-xl flex items-center justify-center bg-kc-surface-container text-kc-on-surface-variant hover:bg-kc-primary hover:text-kc-on-primary transition-all duration-200"
+              >
+                <Icon size={13} />
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="mt-8 border-t border-gray-100 pt-6">
-          <p className="text-center text-xs text-gray-500">
+        {/* Tonal divider — background shift, no border */}
+        <div className="mt-10 pt-6" style={{ borderTop: "1px solid var(--kc-outline-variant)" }}>
+          <p className="text-center text-xs text-kc-on-surface-variant">
             © {new Date().getFullYear()} KindCotton. All rights reserved.
           </p>
         </div>
