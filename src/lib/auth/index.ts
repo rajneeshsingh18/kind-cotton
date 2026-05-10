@@ -6,8 +6,10 @@ import { Role } from "@prisma/client"
 
 import db from "@/lib/db"
 
+import type { Adapter } from "next-auth/adapters"
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(db) as any,
+  adapter: PrismaAdapter(db) as Adapter,
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,

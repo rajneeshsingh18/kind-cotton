@@ -23,7 +23,10 @@ npx prisma generate
 # Database migrations
 npx prisma migrate dev --name <migration-name>
 npx prisma studio  # GUI for database
+npx prisma db seed  # Seed initial categories and products
 ```
+
+**No test framework is configured** (no Jest, Vitest, Playwright, or Cypress).
 
 ## Environment Variables
 
@@ -40,9 +43,11 @@ Required in `.env`:
 - **TailwindCSS v4** (PostCSS plugin, not the legacy config)
 - **Prisma 6** with PostgreSQL (Neon)
 - **NextAuth v5 (beta)** — JWT sessions, Google OAuth, Prisma adapter
-- **Zustand** — client-side cart state (persisted to localStorage)
+- **Zustand** — client-side cart state (persisted to localStorage under key `cart-storage`)
+- **Redux Toolkit** — theme (light/dark) and UI state (announcement banner); see `src/store/`
 - **shadcn/ui** — component library (new-york style, neutral base, Lucide icons)
 - **Razorpay** — payment processing (INR, amounts in paise)
+- **framer-motion** — animations (QuickView modal, product cards)
 
 ### Directory Structure
 
@@ -64,7 +69,11 @@ src/
 │   ├── db/index.ts      # Prisma client singleton
 │   ├── payments/        # Payment utilities
 │   └── razorpay.ts      # Razorpay script loader
-├── store/cart.store.ts  # Zustand cart store
+├── store/
+│   ├── cart.store.ts    # Zustand cart store
+│   ├── index.ts         # Redux store (theme + ui slices)
+│   ├── theme.slice.ts   # setTheme / toggleTheme actions
+│   └── ui.slice.ts      # dismissBanner action
 ├── config/              # Site config, navigation, theme
 ├── hooks/
 ├── types/
@@ -77,9 +86,11 @@ src/
 
 **Database access**: Use the Prisma singleton from `src/lib/db/index.ts`. Never instantiate `PrismaClient` directly.
 
-**Auth session**: The session contains `user.id` and `user.role` (injected in the `session` and `jwt` callbacks in `src/lib/auth/index.ts`).
+**Auth session**: The session contains `user.id` and `user.role` (injected in the `session` and `jwt` callbacks in `src/lib/auth/index.ts`). Only Google OAuth is configured — no email/password auth. Call `await auth()` in server components/routes to get the session.
 
 **Cart state**: Zustand store in `src/store/cart.store.ts` handles all cart logic client-side. Cart is persisted to localStorage.
+
+**Theme state**: Redux Toolkit manages theme (light/dark) and UI state. The `ThemeApplier` component reads the Redux store and applies `.dark` to `<html>`. Dark mode uses a `.dark` class strategy, not `prefers-color-scheme` at runtime.
 
 **Payment flow** (Razorpay):
 1. `/api/razorpay/customer` — create/fetch Razorpay customer

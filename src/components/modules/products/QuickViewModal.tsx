@@ -29,7 +29,7 @@ export function QuickViewModal() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+            className="relative max-w-4xl w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
             {/* We can simply reuse the component from our product detail page */}
@@ -37,7 +37,7 @@ export function QuickViewModal() {
             
             <button
               onClick={close}
-              className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
               aria-label="Close quick view"
             >
               <X className="w-5 h-5" />

@@ -36,7 +36,7 @@ export default function CartPage() {
         <div className="text-center py-20">
           <ShoppingBag className="mx-auto mb-6 h-16 w-16 text-gray-400" />
           <h1 className="text-3xl font-bold mb-2">Your Cart is Empty</h1>
-          <p className="text-gray-500 mb-8">Looks like you haven&apos;t added anything yet.</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">Looks like you haven&apos;t added anything yet.</p>
           <Button asChild size="lg" className="rounded-full">
             <Link href="/products">🛒 Start Shopping</Link>
           </Button>
@@ -58,21 +58,21 @@ export default function CartPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -200 }}
-                  className="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-lg shadow-sm border"
+                  className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-lg shadow-sm border dark:border-gray-800"
                 >
                   <div className="relative h-24 w-24 rounded-md overflow-hidden flex-shrink-0">
                     <Image src={item.img} alt={item.title} fill className="object-cover" />
                   </div>
                   <div className="flex flex-1 flex-col justify-between w-full">
                     <h2 className="font-semibold text-lg">{item.title}</h2>
-                    <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{formatPrice(item.price)}</p>
                     <div className="mt-2 flex items-center justify-between gap-6">
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, "decrease")}>
+                        <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, "decrease")} className="dark:border-gray-700">
                           <Minus className="h-4 w-4" />
                         </Button>
                         <span className="w-10 text-center font-semibold text-lg">{item.quantity}</span>
-                        <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, "increase")}>
+                        <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, "increase")} className="dark:border-gray-700">
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
@@ -80,7 +80,7 @@ export default function CartPage() {
                     </div>
                   </div>
                   <div className="self-start sm:self-center">
-                    <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="hover:bg-red-50">
+                    <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20">
                       <Trash2 className="h-5 w-5 text-red-500" />
                     </Button>
                   </div>
@@ -90,11 +90,11 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-sm border space-y-4 sticky top-24">
+          <div className="lg:col-span-1 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border dark:border-gray-800 space-y-4 sticky top-24">
             <h2 className="text-xl font-semibold">Order Summary</h2>
             <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
             <div className="flex justify-between"><span>Shipping</span><span>{shippingCost === 0 ? "Free" : formatPrice(shippingCost)}</span></div>
-            <hr />
+            <hr className="dark:border-gray-800" />
             <div className="flex justify-between font-bold text-lg"><span>Total</span><span>{formatPrice(total)}</span></div>
             <Button
               size="lg"
@@ -105,7 +105,7 @@ export default function CartPage() {
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Proceed to Checkout
             </Button>
-            <p className="text-xs text-gray-500 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
               Secure checkout — All transactions are encrypted
             </p>
           </div>
